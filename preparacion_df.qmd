@@ -61,3 +61,51 @@ df <- df_og |>
 ```
 
 ## Limpieza de las variables
+
+### bathroom_text
+
+```{r}
+unique(df$bathrooms_text)
+
+df$bathrooms_text <- ifelse(df$bathrooms_text == "Shared half-bath", "0.5 Shared bath",
+                            ifelse(df$bathrooms_text == "Private half-bath", "0.5 bath",
+                            ifelse(df$bathrooms_text == "Half-bath", "0.5 bath", df$bathrooms_text)))
+
+df$shared_bathrooms <- grepl("shared|Shared", df$bathrooms_text)
+
+df$n_bathrooms <- sapply(strsplit(df$bathrooms_text, " "), function(x) as.numeric(x[1]))
+
+bathrooms_text_position <- which(colnames(df) == "bathrooms_text")
+
+df <- df %>%
+  relocate(all_of(c("n_bathrooms", "shared_bathrooms")), .before = bathrooms_text_position)
+
+
+df <- df %>%
+  select(-bathrooms_text)
+
+rm(bathrooms_text_position)
+```
+
+### price
+
+```{r}
+df$price <- as.numeric(gsub("\\$", "", df$price))
+```
+
+### review_score_rating
+
+```{r}
+df$review_scores_rating <- ifelse(df$review_scores_rating == 0, NA, df$review_scores_rating)
+```
+
+## Ajuste tipos de datos de las variables
+
+```{r}
+df <- df %>%
+  mutate(
+    neighbourhood_group_cleansed = factor(neighbourhood_group_cleansed),
+    property_type = factor(property_type),
+    room_type = factor(room_type)
+  )
+```
