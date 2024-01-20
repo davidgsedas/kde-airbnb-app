@@ -1,11 +1,26 @@
+---
+title: "preparacion_df"
+format: html
+editor: visual
+---
+
+# Librería utilizadas
+
+```{r}
 library(tidyverse)
+```
 
+# Cargado de datos
+
+```{r}
 df_og <- read_csv("listings_bcn.csv")
+```
 
-# Para la elaboración de la app, simplemente necesitamos aquellos datos que sean. 
-# propios del piso en si, y que sea cuantitativo o cualitativo.
-# Cualquier cosa relacionada que no sea relevante en torno al piso se descarta.
+# Limpieza de datos
 
+## Selección de variables
+
+```{r}
 df <- df_og |>
   select(id, 
          name, # A pesar de que no es cualitativo, nos sirve para identificar al piso
@@ -43,23 +58,6 @@ df <- df_og |>
          review_scores_location,
          review_scores_value
          ) 
+```
 
-# Aplicar transformaciones de ML
-# PENDIENTE
-
-# Extender amenities
-# AMENITIES REQUIERE DE DEMASIADAS MODIFICACIONES, NO VAMOS A INCLUIRLO NI AQUI NI EN ML
-# df$amenities <- strsplit(df$amenities, ", ")
-# df_amenities <- unnest(df, cols = amenities)
-#   
-# # Crear las columnas de strings únicos y llenarlas con TRUE/FALSE
-# df_amenities_ancho <- df_amenities %>%
-#   mutate(value = TRUE) %>%
-#   complete(id, amenities, fill = list(value = FALSE)) %>%
-#   pivot_wider(names_from = amenities, values_from = value)
-
-# Limpieza de datos
-df$price <- as.numeric(gsub("\\$", "", df$price))
-
-
-df$review_scores_rating <- ifelse(df$review_scores_rating == 0, NA, df$review_scores_rating)
+## Limpieza de las variables
