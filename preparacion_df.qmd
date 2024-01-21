@@ -27,7 +27,6 @@ df <- df_og |>
          neighbourhood_group_cleansed,
          latitude,
          longitude,
-         property_type,
          room_type,
          accommodates,
          bathrooms_text,
@@ -36,12 +35,6 @@ df <- df_og |>
          price,
          minimum_nights,
          maximum_nights,
-         maximum_minimum_nights,
-         maximum_maximum_nights,
-         minimum_maximum_nights,
-         maximum_maximum_nights,
-         minimum_nights_avg_ntm,
-         maximum_nights_avg_ntm,
          has_availability,
          availability_30,
          availability_60,
@@ -105,7 +98,48 @@ df$review_scores_rating <- ifelse(df$review_scores_rating == 0, NA, df$review_sc
 df <- df %>%
   mutate(
     neighbourhood_group_cleansed = factor(neighbourhood_group_cleansed),
-    property_type = factor(property_type),
     room_type = factor(room_type)
   )
+```
+
+## Renombre de columnas
+
+```{r}
+df_es <- df |>
+  select(id, 
+         nombre = name, 
+         barrio = neighbourhood_group_cleansed,
+         latitud = latitude,
+         longitud = longitude,
+         tipo_propiedad = room_type,
+         capacidad = accommodates,
+         banos = n_bathrooms,
+         bano_compartido = shared_bathrooms,
+         dormitorios = bedrooms,
+         camas = beds,
+         precio = price,
+         noches_minimas = minimum_nights,
+         noches_maximas = maximum_nights,
+         disponible = has_availability,
+         disponibilidad_30 = availability_30,
+         disponibilidad_60 = availability_60,
+         disponibilidad_90 = availability_90,
+         disponibilidad_365 = availability_365,
+         n_reviews = number_of_reviews,
+         n_reviews_ultimo_mes = number_of_reviews_ltm,
+         n_reviews_30 = number_of_reviews_l30d,
+         puntuacion_reviews_general = review_scores_rating,
+         puntuacion_reviews_precision = review_scores_accuracy,
+         puntuacion_reviews_limpieza = review_scores_cleanliness,
+         puntuacion_reviews_checkin = review_scores_checkin,
+         puntuacion_reviews_comunicacion = review_scores_communication,
+         puntuacion_reviews_localizacion = review_scores_location,
+         puntuacion_reviews_valor = review_scores_value 
+         ) 
+```
+
+# Guardado de archivo
+
+```{r}
+saveRDS(df, "clean_airbnb_data.rds")
 ```
