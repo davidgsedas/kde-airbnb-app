@@ -142,8 +142,11 @@ df_es <- df |>
 ```{r}
 sumatorioNA <- df_es %>% summarise(across(everything(), ~ sum(is.na(.))))
 
+
 df_es <- df_es %>%
-  mutate(across(where(is.numeric), ~floor(replace_na(., mean(., na.rm = TRUE)))))
+  mutate(across(where(is.numeric), ~if (any(is.na(.))) floor(replace_na(., mean(., na.rm = TRUE))) else .))
+# df_es <- df_es %>%
+#   mutate(across(where(is.numeric), ~floor(replace_na(., mean(., na.rm = TRUE)))))
 ```
 
 # Guardado de archivo

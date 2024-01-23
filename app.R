@@ -69,51 +69,39 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
-  output$tablaFiltrada <- renderDT({
-    filtered_data <- df_shiny
-    
-    # # Filtrado por barrio
-    if(input$barrio != "Todos") {
-       filtered_data <- filtered_data[filtered_data$barrio == input$barrio, ]
-     }
-    
-    # Filtrado por tipo de propiedad
-    if(input$tipo_propiedad != "Todos") {
-      filtered_data <- filtered_data[filtered_data$tipo_propiedad == input$tipo_propiedad, ]
-    }
-    
-    # Filtrado por disponibilidad
-    if(input$disponible != "Todos") {
-      disponibilidad <- ifelse(input$disponible == TRUE, FALSE)
-      filtered_data <- filtered_data[filtered_data$disponible == disponibilidad, ]
-    }
-    
-    # Filtrado por sliders y numericInputs
-
-    filtered_data <- filtered_data$latitud >= input$latitud[1] & filtered_data$latitud <= input$latitud[2] 
-      filtered_data <- filtered_data$longitud >= input$longitud[1] & filtered_data$longitud <= input$longitud[2] 
-      filtered_data <- filtered_data$capacidad >= input$capacidad[1] & filtered_data$capacidad <= input$capacidad[2] 
-      filtered_data <- filtered_data$banos >= input$banos[1] & filtered_data$banos <= input$banos[2] 
-      filtered_data <- filtered_data$dormitorios >= input$dormitorios[1] & filtered_data$dormitorios <= input$dormitorios[2] 
-      filtered_data <- filtered_data$camas >= input$camas[1] & filtered_data$camas <= input$camas[2] 
-      filtered_data <- filtered_data$precio >= input$precio[1] & filtered_data$precio <= input$precio[2] 
-      filtered_data <- filtered_data$noches_minimas >= input$noches_minimas[1] & filtered_data$noches_minimas <= input$noches_minimas[2] 
-      filtered_data <- filtered_data$noches_maximas >= input$noches_maximas[1] & filtered_data$noches_maximas <= input$noches_maximas[2] 
-      filtered_data <- filtered_data$disponibilidad_30 >= input$disponibilidad_30 
-      filtered_data <- filtered_data$disponibilidad_60 >= input$disponibilidad_60 
-      filtered_data <- filtered_data$disponibilidad_90 >= input$disponibilidad_90 
-      filtered_data <- filtered_data$disponibilidad_365 >= input$disponibilidad_365 
-      filtered_data <- filtered_data$puntuacion_reviews_general >= input$puntuacion_reviews_general[1] & filtered_data$puntuacion_reviews_general <= input$puntuacion_reviews_general[2] 
-      filtered_data <- filtered_data$puntuacion_reviews_precision >= input$puntuacion_reviews_precision[1] & filtered_data$puntuacion_reviews_precision <= input$puntuacion_reviews_precision[2] 
-      filtered_data <- filtered_data$puntuacion_reviews_limpieza >= input$puntuacion_reviews_limpieza[1] & filtered_data$puntuacion_reviews_limpieza <= input$puntuacion_reviews_limpieza[2] 
-      filtered_data <- filtered_data$puntuacion_reviews_checkin >= input$puntuacion_reviews_checkin[1] & filtered_data$puntuacion_reviews_checkin <= input$puntuacion_reviews_checkin[2] 
-      filtered_data <- filtered_data$puntuacion_reviews_comunicacion >= input$puntuacion_reviews_comunicacion[1] & filtered_data$puntuacion_reviews_comunicacion <= input$puntuacion_reviews_comunicacion[2] 
-      filtered_data <- filtered_data$puntuacion_reviews_localizacion >= input$puntuacion_reviews_localizacion[1] & filtered_data$puntuacion_reviews_localizacion <= input$puntuacion_reviews_localizacion[2] 
-      filtered_data <- filtered_data$puntuacion_reviews_valor >= input$puntuacion_reviews_valor[1] & filtered_data$puntuacion_reviews_valor <= input$puntuacion_reviews_valor[2]
-     
-     datatable(filtered_data)
-  })
-}
+    output$tablaFiltrada <- renderDT({
+      filtered_data <- df_shiny
+      
+      # Filtrado con dplyr
+      filtered_data <- filtered_data %>%
+        filter(if(input$barrio != "Todos") barrio == input$barrio else TRUE) %>%
+        filter(if(input$tipo_propiedad != "Todos") tipo_propiedad == input$tipo_propiedad else TRUE) %>%
+        filter(if(input$disponible != "Todos") disponible == (input$disponible == "Sí") else TRUE) %>%
+        filter(latitud >= input$latitud[1], latitud <= input$latitud[2]) %>%
+        filter(longitud >= input$longitud[1], longitud <= input$longitud[2]) %>%
+        filter(capacidad >= input$capacidad[1], capacidad <= input$capacidad[2]) %>%
+        filter(banos >= input$banos[1], banos <= input$banos[2]) %>%
+        filter(dormitorios >= input$dormitorios[1], dormitorios <= input$dormitorios[2]) %>%
+        filter(camas >= input$camas[1], camas <= input$camas[2]) %>%
+        filter(precio >= input$precio[1], precio <= input$precio[2]) %>%
+        filter(noches_minimas >= input$noches_minimas[1], noches_minimas <= input$noches_minimas[2]) %>%
+        filter(noches_maximas >= input$noches_maximas[1], noches_maximas <= input$noches_maximas[2]) %>%
+        filter(disponibilidad_30 >= input$disponibilidad_30) %>%
+        filter(disponibilidad_60 >= input$disponibilidad_60) %>%
+        filter(disponibilidad_90 >= input$disponibilidad_90) %>%
+        filter(disponibilidad_365 >= input$disponibilidad_365) %>%
+        filter(puntuacion_reviews_general >= input$puntuacion_reviews_general[1], puntuacion_reviews_general <= input$puntuacion_reviews_general[2]) %>%
+        filter(puntuacion_reviews_precision >= input$puntuacion_reviews_precision[1], puntuacion_reviews_precision <= input$puntuacion_reviews_precision[2]) %>%
+        filter(puntuacion_reviews_limpieza >= input$puntuacion_reviews_limpieza[1], puntuacion_reviews_limpieza <= input$puntuacion_reviews_limpieza[2]) %>%
+        filter(puntuacion_reviews_checkin >= input$puntuacion_reviews_checkin[1], puntuacion_reviews_checkin <= input$puntuacion_reviews_checkin[2]) %>%
+        filter(puntuacion_reviews_comunicacion >= input$puntuacion_reviews_comunicacion[1], puntuacion_reviews_comunicacion <= input$puntuacion_reviews_comunicacion[2]) %>%
+        filter(puntuacion_reviews_localizacion >= input$puntuacion_reviews_localizacion[1], puntuacion_reviews_localizacion <= input$puntuacion_reviews_localizacion[2]) %>%
+        filter(puntuacion_reviews_valor >= input$puntuacion_reviews_valor[1], puntuacion_reviews_valor <= input$puntuacion_reviews_valor[2])
+      
+      datatable(filtered_data)
+    })
+  }
+  
 
 
 
