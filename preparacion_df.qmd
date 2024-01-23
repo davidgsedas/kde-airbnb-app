@@ -162,3 +162,14 @@ df_es <- df_es |>
 saveRDS(df_es, "clean_airbnb_data.rds")
 write.csv(df_es, "clean_airbnb_data.csv", row.names = FALSE)
 ```
+
+## Guardado para código C++
+
+```{r}
+df_kde <- df_es |>
+  select(latitud, longitud) 
+```
+
+```{r}
+write.csv(df_kde, "codigo_cpp/airbnb.csv", row.names = FALSE)
+```
