@@ -60,7 +60,7 @@ int main() {
         outputFile << fixed << setprecision(6) << latitudes[i] << "," << longitudes[i] << "," << kdeLatitudes[i] << endl;
     }
 
-    cout << "Proceso completado. Resultados almacenados en " << outputFileName << endl;
+    cout << "Proceso completado: " << outputFileName << endl;
 
     inputFile.close();
     outputFile.close();

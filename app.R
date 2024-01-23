@@ -1,7 +1,5 @@
 library(shiny)
 library(DT)
-library(leaflet)
-library(Rcpp)
 library(MASS)
 
 # Carga el archivo RDS
@@ -104,22 +102,26 @@ server <- function(input, output) {
       filter(puntuacion_reviews_localizacion >= input$puntuacion_reviews_localizacion[1], puntuacion_reviews_localizacion <= input$puntuacion_reviews_localizacion[2]) %>%
       filter(puntuacion_reviews_valor >= input$puntuacion_reviews_valor[1], puntuacion_reviews_valor <= input$puntuacion_reviews_valor[2])
     
-    # Realizar el análisis KDE
-    kde_result <- kde2d(filtered_data$longitud, filtered_data$latitud, n = 100)
-    kde_data <- expand.grid(x = kde_result$x, y = kde_result$y)
-    kde_data$z <- as.vector(kde_result$z)
-    
-    # Preparar el gráfico de ggplot
-    ggplot_data <- ggplot() +
-      geom_tile(data = kde_data, aes(x = x, y = y, fill = z), alpha = 0.8) +
-      geom_point(data = filtered_data, aes(x = longitud, y = latitud)) +
-      scale_fill_gradient(low = "white", high = "red") +
-      labs(fill = "Densidad KDE")
-    
-    # Renderizar el gráfico KDE en la aplicación Shiny
-    output$kdePlot <- renderPlot({
-      ggplot_data
-    })
+    # Verificar si hay datos para evitar errores
+    # Verificar si hay datos para evitar errores
+    if(nrow(filtered_data) > 0) {
+      # Realizar el análisis KDE
+      kde_result <- MASS::kde2d(filtered_data$longitud, filtered_data$latitud, n = 100)
+      kde_data <- expand.grid(x = kde_result$x, y = kde_result$y)
+      kde_data$z <- as.vector(kde_result$z)
+      
+      # ggplot
+      ggplot_data <- ggplot() +
+        geom_tile(data = kde_data, aes(x = x, y = y, fill = z), alpha = 0.8) +
+        geom_point(data = filtered_data, aes(x = longitud, y = latitud)) +
+        scale_fill_gradient(low = "white", high = "red") +
+        labs(fill = "Densidad KDE")
+      
+      # Renderizar gráfico KDE en ggplot
+      output$kdePlot <- renderPlot({
+        ggplot_data
+      })
+    }
     
     # Renderizar la tabla filtrada
     output$tablaFiltrada <- renderDT({
@@ -127,13 +129,8 @@ server <- function(input, output) {
     })
   })
 }
-  
-
-
 
 # Ejecuta la aplicación
 shinyApp(ui = ui, server = server)
-
-
 
 

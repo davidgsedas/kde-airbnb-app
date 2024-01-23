@@ -1,0 +1,68 @@
+---
+title: "Advanced Programming for Data Analytics: Assignment Brief"
+format: html
+editor: visual
+---
+
+# Introducción
+El analisis de datos es un campo crucial en la ciencia de datos y la toma de decisiones basada en datos en muchas áreas tanto académicas como comerciales. Tanto R como Python son lenguajes de programación poderosos y ampliamente utilizados en el análisis de datos. Sin embargo, aunque ambas herramientas sean muy buenas en el campo de analisis de datos por si mismas de datos a nivel general muchas veces necesitamos complementarlo con paquetes o librerías externas, incluso a veces haciendo uso de otros lenguajes de programación para procesos en los cuales pueden funcionar mejor que Python o R. En este trabajo haremos uso de tanto librerías externas como del lenguaje C++ para realizar un procedimiento de analisis de datos.
+
+# Objetivos del proyecto
+Con este proyecto queremos crear una herramienta orientada tanto para propietarios de alojamientos con licencia turística como para personas con intención de inversión de en ese sector que sirva para estudiar la situación del mercado, la competencia o posibles oportunidades de negocio, dentro de la ciudad de Barcelona. Esta herramienta será un dashboard que permita filtrar según las características que se quieran estudiar y permita visualizar la situación geográfica de los alojamientos con esos filtros.
+
+## Necesidades del proceso
+Para la creación de la herramienta debemos tener en cuenta diversos factores:
+
+**Definir requisitos y funcionalidades**
+
+**Buscar una fuente de datos relevante**
+Los datos son el
+
+**Limpiar los datos de forma que se pueda mantener la perspectiva mas real posible**
+
+**Elaborar un interfaz**
+
+**Optimizar el código para rendimiento y escalabilidad**
+
+En caso de que esto fuera una propuesta real para el lanzamiento de la herramienta deberíamos tener en cuenta también otros elementos como:
+
+- Seguridad y privacidad de datos
+
+- Pruebas y validación
+
+- Elaborar documentación completa
+
+# Datos utilizados
+Los datos que se van a utilizar provienen de Inside Airbnb, una organización sin animo de lucro, impulsada con la misión de informara las comunidades sobre el impacto y la realidad del alojamiento a corto plazo. Estos han sido extraidos de la propia plataforma de Airbnb con funciones de scrapping. Se omite la información privada. Los datos tienen licencia de "fair use".
+
+El análisis se centra en un conjunto de datos que refleja los listados de alojamiento en activo extraídos de la plataforma Airbnb, específicamente para la ciudad de Barcelona. Este conjunto incluye registros detallados que comprenden información geográfica, precios, características del alojamiento y amenidades ofrecidas. Las variables clave que serán examinadas incluyen la latitud y longitud para la ubicación espacial y el precio por noche como indicador económico.
+
+# Herramientas a utilizar para el proyecto
+En el proyecto vamos a utilizar las siguientes herramientas:
+
+- R
+Como hemos dicho anteriormente, en procesos de análisis de datos los lenguajes de programación con mas soporte son tanto R como Python. Python es un lenguaje mas universal y tiene mas fines, sin embargo en este proyecto vamos a priorizar tanto la manipulación de datos como la visualización por lo que R y el paquete de tidyverse, puede ser mejor herramienta en este caso.
+
+- Shiny
+La herramienta final que queremos crear es un dashboard interactivo. Podríamos optar por un programa externo, pero es mas conveniente hacer uso de algún paquete en R. Shiny es uno de los paquetes con mas recursos y funciona a través de una aplicación web interactiva, lo que nos permite crear nuestro objetivo.
+
+- C++ 
+Para ciertos calculos e interacciones que requieran procesamientos de alto rendimiento puede ser mas conveniente utilizar C++. Haremos alguna prueba y compararemos los tiempos de procesado de R vs C++.
+
+# Resultados esperados
+Los resultados finales de nuestro proceso deben contener:
+
+**Opciones de filtrado de todas las variables y con todos los valores**
+Queremos que la herramienta tenga flexibilidad total y que permita cualquier filtro y con cualquier variable.
+
+**Visualización con mapa**
+Para poder ver la localización geográfica 
+
+**Visualización con tablas**
+La herramienta debe permitir poder ver las entradas al completo para ofrecer la capacidad de encontrar patrones e información conveniente.
+
+**Usabilidad**
+La herramienta tiene que ser usable y tener un buen diseño.
+
+# Limpieza de datos
+Para poder hacer interacción con los datos debemos tener en cuenta el tipo de datos de las columnas, el uso de factores, modificar algunos strings para únificar opciones y especialmente el uso de NA's
