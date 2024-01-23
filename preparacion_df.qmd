@@ -137,8 +137,18 @@ df_es <- df |>
          ) 
 ```
 
+# Ajuste de NA's
+
+```{r}
+sumatorioNA <- df_es %>% summarise(across(everything(), ~ sum(is.na(.))))
+
+df_es <- df_es %>%
+  mutate(across(where(is.numeric), ~floor(replace_na(., mean(., na.rm = TRUE)))))
+```
+
 # Guardado de archivo
 
 ```{r}
-saveRDS(df, "clean_airbnb_data.rds")
+saveRDS(df_es, "clean_airbnb_data.rds")
+write.csv(df_es, "clean_airbnb_data.csv", row.names = FALSE)
 ```
