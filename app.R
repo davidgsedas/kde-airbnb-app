@@ -72,50 +72,59 @@ ui <- fluidPage(
   )
 )
 
-server <- function(input, output) {
-  
+server <- function(input, output, session) {
+  # Renderizar el mapa inicial
   output$mapa <- renderLeaflet({
     leaflet() %>%
-      addTiles() %>%  # Añade las baldosas del mapa (tiles)
-      setView(lng = mean(df_shiny$longitud), lat = mean(df_shiny$latitud), zoom = 12)  # Configura la vista inicial del mapa
+      addTiles() %>%
+      setView(lng = mean(df_shiny$longitud, na.rm = TRUE), lat = mean(df_shiny$latitud, na.rm = TRUE), zoom = 12)
   })
-
+  
+  observe({
+    # Filtrado con dplyr
+    filtered_data <- df_shiny %>%
+      filter(if(input$barrio != "Todos") barrio == input$barrio else TRUE) %>%
+      filter(if(input$tipo_propiedad != "Todos") tipo_propiedad == input$tipo_propiedad else TRUE) %>%
+      filter(if(input$disponible != "Todos") disponible == (input$disponible == "Sí") else TRUE) %>%
+      filter(latitud >= input$latitud[1], latitud <= input$latitud[2]) %>%
+      filter(longitud >= input$longitud[1], longitud <= input$longitud[2]) %>%
+      filter(capacidad >= input$capacidad[1], capacidad <= input$capacidad[2]) %>%
+      filter(banos >= input$banos[1], banos <= input$banos[2]) %>%
+      filter(dormitorios >= input$dormitorios[1], dormitorios <= input$dormitorios[2]) %>%
+      filter(camas >= input$camas[1], camas <= input$camas[2]) %>%
+      filter(precio >= input$precio[1], precio <= input$precio[2]) %>%
+      filter(noches_minimas >= input$noches_minimas[1], noches_minimas <= input$noches_minimas[2]) %>%
+      filter(noches_maximas >= input$noches_maximas[1], noches_maximas <= input$noches_maximas[2]) %>%
+      filter(disponibilidad_30 >= input$disponibilidad_30) %>%
+      filter(disponibilidad_60 >= input$disponibilidad_60) %>%
+      filter(disponibilidad_90 >= input$disponibilidad_90) %>%
+      filter(disponibilidad_365 >= input$disponibilidad_365) %>%
+      filter(puntuacion_reviews_general >= input$puntuacion_reviews_general[1], puntuacion_reviews_general <= input$puntuacion_reviews_general[2]) %>%
+      filter(puntuacion_reviews_precision >= input$puntuacion_reviews_precision[1], puntuacion_reviews_precision <= input$puntuacion_reviews_precision[2]) %>%
+      filter(puntuacion_reviews_limpieza >= input$puntuacion_reviews_limpieza[1], puntuacion_reviews_limpieza <= input$puntuacion_reviews_limpieza[2]) %>%
+      filter(puntuacion_reviews_checkin >= input$puntuacion_reviews_checkin[1], puntuacion_reviews_checkin <= input$puntuacion_reviews_checkin[2]) %>%
+      filter(puntuacion_reviews_comunicacion >= input$puntuacion_reviews_comunicacion[1], puntuacion_reviews_comunicacion <= input$puntuacion_reviews_comunicacion[2]) %>%
+      filter(puntuacion_reviews_localizacion >= input$puntuacion_reviews_localizacion[1], puntuacion_reviews_localizacion <= input$puntuacion_reviews_localizacion[2]) %>%
+      filter(puntuacion_reviews_valor >= input$puntuacion_reviews_valor[1], puntuacion_reviews_valor <= input$puntuacion_reviews_valor[2])
+    
+    # Verifica si filtered_data no es NULL y tiene las columnas requeridas
+    if (!is.null(filtered_data) && "latitud" %in% names(filtered_data) && "longitud" %in% names(filtered_data) && "nombre" %in% names(filtered_data)) {
+      # Actualizar el mapa
+      leafletProxy("mapa", session = session) %>%
+        clearMarkers() %>%
+        addMarkers(~longitud, ~latitud, popup = ~as.character(nombre))
+    } else {
+      # Limpia los marcadores si no hay datos válidos
+      leafletProxy("mapa", session = session) %>%
+        clearMarkers()
+    }
+    
+    # Actualizar la tabla
     output$tablaFiltrada <- renderDT({
-      filtered_data <- df_shiny
-      
-      
-      # Filtrado con dplyr
-      filtered_data <- filtered_data %>%
-        filter(if(input$barrio != "Todos") barrio == input$barrio else TRUE) %>%
-        filter(if(input$tipo_propiedad != "Todos") tipo_propiedad == input$tipo_propiedad else TRUE) %>%
-        filter(if(input$disponible != "Todos") disponible == (input$disponible == "Sí") else TRUE) %>%
-        filter(latitud >= input$latitud[1], latitud <= input$latitud[2]) %>%
-        filter(longitud >= input$longitud[1], longitud <= input$longitud[2]) %>%
-        filter(capacidad >= input$capacidad[1], capacidad <= input$capacidad[2]) %>%
-        filter(banos >= input$banos[1], banos <= input$banos[2]) %>%
-        filter(dormitorios >= input$dormitorios[1], dormitorios <= input$dormitorios[2]) %>%
-        filter(camas >= input$camas[1], camas <= input$camas[2]) %>%
-        filter(precio >= input$precio[1], precio <= input$precio[2]) %>%
-        filter(noches_minimas >= input$noches_minimas[1], noches_minimas <= input$noches_minimas[2]) %>%
-        filter(noches_maximas >= input$noches_maximas[1], noches_maximas <= input$noches_maximas[2]) %>%
-        filter(disponibilidad_30 >= input$disponibilidad_30) %>%
-        filter(disponibilidad_60 >= input$disponibilidad_60) %>%
-        filter(disponibilidad_90 >= input$disponibilidad_90) %>%
-        filter(disponibilidad_365 >= input$disponibilidad_365) %>%
-        filter(puntuacion_reviews_general >= input$puntuacion_reviews_general[1], puntuacion_reviews_general <= input$puntuacion_reviews_general[2]) %>%
-        filter(puntuacion_reviews_precision >= input$puntuacion_reviews_precision[1], puntuacion_reviews_precision <= input$puntuacion_reviews_precision[2]) %>%
-        filter(puntuacion_reviews_limpieza >= input$puntuacion_reviews_limpieza[1], puntuacion_reviews_limpieza <= input$puntuacion_reviews_limpieza[2]) %>%
-        filter(puntuacion_reviews_checkin >= input$puntuacion_reviews_checkin[1], puntuacion_reviews_checkin <= input$puntuacion_reviews_checkin[2]) %>%
-        filter(puntuacion_reviews_comunicacion >= input$puntuacion_reviews_comunicacion[1], puntuacion_reviews_comunicacion <= input$puntuacion_reviews_comunicacion[2]) %>%
-        filter(puntuacion_reviews_localizacion >= input$puntuacion_reviews_localizacion[1], puntuacion_reviews_localizacion <= input$puntuacion_reviews_localizacion[2]) %>%
-        filter(puntuacion_reviews_valor >= input$puntuacion_reviews_valor[1], puntuacion_reviews_valor <= input$puntuacion_reviews_valor[2])
-      
       datatable(filtered_data)
     })
-}  
-  
-
-
+  })
+}
 
 # Ejecuta la aplicación
 shinyApp(ui = ui, server = server)
