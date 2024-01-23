@@ -1,5 +1,6 @@
 library(shiny)
 library(DT)
+library(leaflet)
 
 # Carga el archivo RDS
 df_shiny <- readRDS("clean_airbnb_data.rds")
@@ -14,6 +15,7 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
+      
       h1("Menú de filtros"),
       
       br(),
@@ -62,6 +64,8 @@ ui <- fluidPage(
       
     ),
     mainPanel(
+      h1("Mapa de alojamientos"),
+      leafletOutput("mapa"),
       h1("Tabla filtrada"),
       DTOutput("tablaFiltrada")
     )
@@ -69,8 +73,16 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
+  
+  output$mapa <- renderLeaflet({
+    leaflet() %>%
+      addTiles() %>%  # Añade las baldosas del mapa (tiles)
+      setView(lng = mean(df_shiny$longitud), lat = mean(df_shiny$latitud), zoom = 12)  # Configura la vista inicial del mapa
+  })
+
     output$tablaFiltrada <- renderDT({
       filtered_data <- df_shiny
+      
       
       # Filtrado con dplyr
       filtered_data <- filtered_data %>%
@@ -100,7 +112,7 @@ server <- function(input, output) {
       
       datatable(filtered_data)
     })
-  }
+}  
   
 
 

@@ -149,6 +149,13 @@ df_es <- df_es %>%
 #   mutate(across(where(is.numeric), ~floor(replace_na(., mean(., na.rm = TRUE)))))
 ```
 
+# Ordenamos la tabla
+
+```{r}
+df_es <- df_es |>
+  arrange(df_es, )
+```
+
 # Guardado de archivo
 
 ```{r}
