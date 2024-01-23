@@ -153,7 +153,7 @@ df_es <- df_es %>%
 
 ```{r}
 df_es <- df_es |>
-  arrange(df_es, id)
+  arrange(df_es, )
 ```
 
 # Guardado de archivo

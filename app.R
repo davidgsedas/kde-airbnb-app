@@ -1,6 +1,8 @@
 library(shiny)
 library(DT)
 library(leaflet)
+library(Rcpp)
+library(MASS)
 
 # Carga el archivo RDS
 df_shiny <- readRDS("clean_airbnb_data.rds")
@@ -64,21 +66,16 @@ ui <- fluidPage(
       
     ),
     mainPanel(
-      h1("Mapa de alojamientos"),
-      leafletOutput("mapa"),
+      h1("Visualización KDE"),
+      plotOutput("kdePlot"),
       h1("Tabla filtrada"),
       DTOutput("tablaFiltrada")
     )
   )
 )
 
-server <- function(input, output, session) {
-  # Renderizar el mapa inicial
-  output$mapa <- renderLeaflet({
-    leaflet() %>%
-      addTiles() %>%
-      setView(lng = mean(df_shiny$longitud, na.rm = TRUE), lat = mean(df_shiny$latitud, na.rm = TRUE), zoom = 12)
-  })
+# Server
+server <- function(input, output) {
   
   observe({
     # Filtrado con dplyr
@@ -107,24 +104,32 @@ server <- function(input, output, session) {
       filter(puntuacion_reviews_localizacion >= input$puntuacion_reviews_localizacion[1], puntuacion_reviews_localizacion <= input$puntuacion_reviews_localizacion[2]) %>%
       filter(puntuacion_reviews_valor >= input$puntuacion_reviews_valor[1], puntuacion_reviews_valor <= input$puntuacion_reviews_valor[2])
     
-    # Verifica si filtered_data no es NULL y tiene las columnas requeridas
-    if (!is.null(filtered_data) && "latitud" %in% names(filtered_data) && "longitud" %in% names(filtered_data) && "nombre" %in% names(filtered_data)) {
-      # Actualizar el mapa
-      leafletProxy("mapa", session = session) %>%
-        clearMarkers() %>%
-        addMarkers(~longitud, ~latitud, popup = ~as.character(nombre))
-    } else {
-      # Limpia los marcadores si no hay datos válidos
-      leafletProxy("mapa", session = session) %>%
-        clearMarkers()
-    }
+    # Realizar el análisis KDE
+    kde_result <- kde2d(filtered_data$longitud, filtered_data$latitud, n = 100)
+    kde_data <- expand.grid(x = kde_result$x, y = kde_result$y)
+    kde_data$z <- as.vector(kde_result$z)
     
-    # Actualizar la tabla
+    # Preparar el gráfico de ggplot
+    ggplot_data <- ggplot() +
+      geom_tile(data = kde_data, aes(x = x, y = y, fill = z), alpha = 0.8) +
+      geom_point(data = filtered_data, aes(x = longitud, y = latitud)) +
+      scale_fill_gradient(low = "white", high = "red") +
+      labs(fill = "Densidad KDE")
+    
+    # Renderizar el gráfico KDE en la aplicación Shiny
+    output$kdePlot <- renderPlot({
+      ggplot_data
+    })
+    
+    # Renderizar la tabla filtrada
     output$tablaFiltrada <- renderDT({
       datatable(filtered_data)
     })
   })
 }
+  
+
+
 
 # Ejecuta la aplicación
 shinyApp(ui = ui, server = server)
